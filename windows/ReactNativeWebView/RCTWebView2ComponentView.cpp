@@ -21,14 +21,28 @@ namespace winrt::ReactNativeWebView::implementation {
 
 void RegisterRCTWebView2ComponentView(
     winrt::Microsoft::ReactNative::IReactPackageBuilder const &packageBuilder) noexcept {
+    OutputDebugStringW(L"[RNW-WebView] RegisterRCTWebView2ComponentView ENTRY\n");
+
+    // Check if Fabric builder is available
+    auto fabricBuilder = packageBuilder.try_as<winrt::Microsoft::ReactNative::IReactPackageBuilderFabric>();
+    if (!fabricBuilder) {
+        OutputDebugStringW(L"[RNW-WebView] ERROR: IReactPackageBuilderFabric cast FAILED - host not Fabric-enabled!\n");
+        return;
+    }
+    OutputDebugStringW(L"[RNW-WebView] IReactPackageBuilderFabric available\n");
+
+    OutputDebugStringW(L"[RNW-WebView] Calling RegisterRCTWebView2NativeComponent (will call AddViewComponent)...\n");
+
     RNCWebViewCodegen::RegisterRCTWebView2NativeComponent<RCTWebView2ComponentView>(
         packageBuilder,
         [](const winrt::Microsoft::ReactNative::Composition::IReactCompositionViewComponentBuilder &builder) {
+            OutputDebugStringW(L"[RNW-WebView] Builder callback executing (component being configured)\n");
             builder.as<winrt::Microsoft::ReactNative::IReactViewComponentBuilder>().XamlSupport(true);
             
             // Use SetContentIslandComponentViewInitializer for XAML hosting
             builder.SetContentIslandComponentViewInitializer(
                 [](const winrt::Microsoft::ReactNative::Composition::ContentIslandComponentView &islandView) noexcept {
+                    OutputDebugStringW(L"[RNW-WebView] ContentIslandComponentViewInitializer called\n");
                     auto userData = winrt::make_self<RCTWebView2ComponentView>();
                     userData->InitializeContentIsland(islandView);
                     islandView.UserData(*userData);
@@ -68,7 +82,10 @@ void RegisterRCTWebView2ComponentView(
                     userData->UpdateState(view, newState);
                 });
         });
+
+    OutputDebugStringW(L"[RNW-WebView] RegisterRCTWebView2ComponentView EXIT\n");
 }
+
 
 void RCTWebView2ComponentView::InitializeContentIsland(
     const winrt::Microsoft::ReactNative::Composition::ContentIslandComponentView &islandView) {
