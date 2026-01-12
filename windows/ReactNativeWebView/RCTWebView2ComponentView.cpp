@@ -23,13 +23,13 @@ void RegisterRCTWebView2ComponentView(
     winrt::Microsoft::ReactNative::IReactPackageBuilder const &packageBuilder) noexcept {
     OutputDebugStringW(L"[RNW-WebView] RegisterRCTWebView2ComponentView ENTRY\n");
 
-    // Check if Fabric builder is available
+    // Check if Fabric builder is available (but don't early-return)
     auto fabricBuilder = packageBuilder.try_as<winrt::Microsoft::ReactNative::IReactPackageBuilderFabric>();
-    if (!fabricBuilder) {
-        OutputDebugStringW(L"[RNW-WebView] ERROR: IReactPackageBuilderFabric cast FAILED - host not Fabric-enabled!\n");
-        return;
+    if (fabricBuilder) {
+        OutputDebugStringW(L"[RNW-WebView] IReactPackageBuilderFabric available\n");
+    } else {
+        OutputDebugStringW(L"[RNW-WebView] WARNING: IReactPackageBuilderFabric cast FAILED - will try registration anyway\n");
     }
-    OutputDebugStringW(L"[RNW-WebView] IReactPackageBuilderFabric available\n");
 
     OutputDebugStringW(L"[RNW-WebView] Calling RegisterRCTWebView2NativeComponent (will call AddViewComponent)...\n");
 
