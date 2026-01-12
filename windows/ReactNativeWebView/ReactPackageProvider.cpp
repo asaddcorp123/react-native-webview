@@ -25,8 +25,9 @@ void ReactPackageProvider::CreatePackage(IReactPackageBuilder const &packageBuil
   {
     wchar_t modulePath[MAX_PATH] = {};
     HMODULE hModule = nullptr;
+    // Use address of a static function to get module handle
     if (GetModuleHandleExW(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,
-                           reinterpret_cast<LPCWSTR>(&ReactPackageProvider::CreatePackage), &hModule)) {
+                           (LPCWSTR)&OutputDebugStringW, &hModule)) {
       GetModuleFileNameW(hModule, modulePath, MAX_PATH);
     }
     wchar_t msg[512];
